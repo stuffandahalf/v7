@@ -260,6 +260,47 @@ extern char *opst[];  /* a vector containing names for ops */
 # ifdef ONEPASS
 	/* in one-pass operation, define the tree nodes */
 
+#if 1
+union ndu {
+	struct {
+		int op;
+		struct {
+			union {
+				int rall;
+				int cdim;
+			};
+			TWORD type;
+			union {
+				int su;
+				int csiz;
+			};
+			union {
+				struct {
+					char name[NCHNAM];
+					union {
+						struct {
+							NODE *left;
+							NODE *right;
+						};
+						struct {
+							CONSZ lval;
+							int rval;
+						};
+					};
+				};
+				int label;
+				struct {
+					int stsize;
+					int stalign;
+				};
+				double dval;
+			};
+		};
+	};
+};
+
+#else
+
 union ndu {
 
 	struct {
@@ -315,4 +356,6 @@ union ndu {
 		};
 
 	};
+#endif
+
 # endif

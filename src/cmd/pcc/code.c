@@ -5,8 +5,8 @@
 
 int proflag;
 int strftn = 0;	/* is the current function one which returns a value */
-FILE *tmpfile;
-FILE *outfile = stdout;
+FILE *tmpfil;
+FILE *outfil;
 
 branch( n ){
 	/* output a branch to label n */
@@ -35,20 +35,20 @@ locctr( l ){
 	switch( l ){
 
 	case PROG:
-		outfile = stdout;
+		outfil = stdout;
 		printf( "	.text\n" );
 		break;
 
 	case DATA:
 	case ADATA:
-		outfile = stdout;
+		outfil = stdout;
 		if( temp != DATA && temp != ADATA )
 			printf( "	.data\n" );
 		break;
 
 	case STRNG:
 	case ISTRNG:
-		outfile = tmpfile;
+		outfil = tmpfil;
 		break;
 
 	case STAB:
@@ -64,7 +64,7 @@ locctr( l ){
 
 deflab( n ){
 	/* output something to define the current position as label n */
-	fprintf( outfile, "L%d:\n", n );
+	fprintf( outfil, "L%d:\n", n );
 	}
 
 int crslab = 10;
@@ -193,14 +193,14 @@ bycode( t, i ){
 
 	i &= 07;
 	if( t < 0 ){ /* end of the string */
-		if( i != 0 ) fprintf( outfile, "\n" );
+		if( i != 0 ) fprintf( outfil, "\n" );
 		}
 
 	else { /* stash byte t into string */
-		if( i == 0 ) fprintf( outfile, "	.byte	" );
-		else fprintf( outfile, "," );
-		fprintf( outfile, "%o", t );
-		if( i == 07 ) fprintf( outfile, "\n" );
+		if( i == 0 ) fprintf( outfil, "	.byte	" );
+		else fprintf( outfil, "," );
+		fprintf( outfil, "%o", t );
+		if( i == 07 ) fprintf( outfil, "\n" );
 		}
 	}
 
@@ -235,7 +235,7 @@ where(c){ /* print location of error  */
 	fprintf( stderr, "%s, line %d: ", ftitle, lineno );
 	}
 
-char *tmpname = "/tmp/pcXXXXXX";
+char tmpname[] = "/tmp/pcXXXXXX";
 
 main( argc, argv ) char *argv[]; {
 	int dexit();
@@ -248,17 +248,18 @@ main( argc, argv ) char *argv[]; {
 			proflag = 1;
 			}
 
+	outfil = stdout;
 	mktemp(tmpname);
 	if(signal( SIGHUP, SIG_IGN) != SIG_IGN) signal(SIGHUP, dexit);
 	if(signal( SIGINT, SIG_IGN) != SIG_IGN) signal(SIGINT, dexit);
 	if(signal( SIGTERM, SIG_IGN) != SIG_IGN) signal(SIGTERM, dexit);
-	tmpfile = fopen( tmpname, "w" );
+	tmpfil = fopen( tmpname, "w" );
 
 	r = mainp1( argc, argv );
 
-	tmpfile = freopen( tmpname, "r", tmpfile );
-	if( tmpfile != NULL )
-		while((c=getc(tmpfile)) != EOF )
+	tmpfil = freopen( tmpname, "r", tmpfil );
+	if( tmpfil != NULL )
+		while((c=getc(tmpfil)) != EOF )
 			putchar(c);
 	else cerror( "Lost temp file" );
 	unlink(tmpname);

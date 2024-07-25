@@ -62,8 +62,14 @@ main(argc,argv) int argc; char *argv[]; {
 
 others(){ /* put out other arrays, copy the parsers */
 	register c, i, j;
+	char *parser;
 
-	finput = fopen( PARSER, "r" );
+	parser = getenv(PARSER_ENV);
+	if (!parser || !strlen(parser)) {
+		parser = PARSER;
+		}
+
+	finput = fopen( parser, "r" );
 	if( finput == NULL ) error( "cannot find parser %s", PARSER );
 
 	warray( "yyr1", levprd, nprod );
@@ -188,7 +194,7 @@ summary(){ /* output the summary on the tty */
 
 /* VARARGS1 */
 error(s,a1) char *s; { /* write out error comment */
-	
+
 	++nerrors;
 	fprintf( stderr, "\n fatal error: ");
 	fprintf( stderr, s,a1);
@@ -549,15 +555,15 @@ closure(i){ /* generate the closure of state i */
 	while( work ){
 		work = 0;
 		WSLOOP(wsets,u){
-	
+
 			if( u->flag == 0 ) continue;
 			c = *(u->pitem);  /* dot is before c */
-	
+
 			if( c < NTBASE ){
 				u->flag = 0;
 				continue;  /* only interesting case is where . is before nonterminal */
 				}
-	
+
 			/* compute the lookahead */
 			aryfil( clset.lset, tbitset, 0 );
 
@@ -579,11 +585,11 @@ closure(i){ /* generate the closure of state i */
 					if( ch<=0 ) setunion( clset.lset, v->ws.lset );
 					}
 				}
-	
+
 			/*  now loop over productions derived from c */
-	
+
 			c -= NTBASE; /* c is now nonterminal number */
-	
+
 			t = pres[c+1];
 			for( s=pres[c]; s<t; ++s ){
 				/* put these items into the closure */
@@ -594,7 +600,7 @@ closure(i){ /* generate the closure of state i */
 						goto nexts;
 						}
 					}
-	
+
 				/*  not there; make a new entry */
 				if( cwp-wsets+1 >= WSETSIZE ) error( "working set overflow" );
 				cwp->pitem = *s;
@@ -604,10 +610,10 @@ closure(i){ /* generate the closure of state i */
 					SETLOOP(k) cwp->ws.lset[k] = clset.lset[k];
 					}
 				WSBUMP(cwp);
-	
+
 			nexts: ;
 				}
-	
+
 			}
 		}
 

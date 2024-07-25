@@ -7,5 +7,7 @@
 	/* location of the parser text file */
 # define PARSER "/usr/lib/yaccpar"
 
+# define PARSER_ENV "YACC_PARSER"
+
 	/* basic size of the Yacc implementation */
 # define MEDIUM

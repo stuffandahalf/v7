@@ -16,6 +16,9 @@
 #ifndef BUFSIZ
 #define BUFSIZ 512
 #endif
+#ifdef __MODERN_HOST__
+#define BUFSIZ 512
+#endif /* __MODERN_HOST__ */
 
 char *pbeg,*pbuf,*pend;
 char *outp,*inp;
@@ -137,7 +140,7 @@ STATIC	char	*dirs[10];	/* -I and <> directories */
 char *strdex(), *copy(), *subst(), *trmdir();
 struct symtab *stsym();
 STATIC	int	fin	= STDIN;
-STATIC	FILE	*fout	= stdout;
+STATIC	FILE	*fout;
 STATIC	int	nd	= 1;
 STATIC	int	pflag;	/* don't put out lines "# 12 foo.c" */
 STATIC	int	passcom;	/* don't delete comments */
@@ -487,7 +490,7 @@ prevlf:
 		else break;
 	} break;
 	} /* end of switch */
-	
+
 	if (isslo) return(p);
 } /* end of infinite loop */
 }
@@ -564,7 +567,7 @@ doincl(p) register char *p; {
 # if gcos
 			strdex(filname, '/')
 # else
-			filname[0]=='/' 
+			filname[0]=='/'
 # endif
 				|| **dirp=='\0') strcpy(nfil,filname);
 		else {
@@ -940,6 +943,8 @@ main(argc,argv)
 	register char *p;
 	char *tf,**cp2;
 
+	fout = stdout;
+
 # if gcos
 	if (setjmp(env)) return (exfail);
 # endif
@@ -1027,7 +1032,7 @@ main(argc,argv)
 					else dirs[nd++] = argv[i]+2;
 					continue;
 				case '\0': continue;
-				default: 
+				default:
 					pperror("unknown flag %s", argv[i]);
 					continue;
 				}
@@ -1048,7 +1053,12 @@ main(argc,argv)
 					extern char _sobuf[BUFSIZ];
 					if (NULL==(fout=fopen(argv[i], "w"))) {
 						pperror("Can't create %s", argv[i]); exit(8);
-					} else {fclose(stdout); setbuf(fout,_sobuf);}
+					} else {
+#ifndef __MODERN_HOST__
+						fclose(stdout);
+						setbuf(fout,_sobuf);
+#endif /* __MODERN_HOST__ */
+					}
 # endif
 				} else pperror("extraneous name %s", argv[i]);
 			}
@@ -1057,6 +1067,12 @@ main(argc,argv)
 	fins[ifno]=fin;
 	exfail = 0;
 		/* after user -I files here are the standard include libraries */
+# ifdef __MODERN_HOST__
+# ifndef __XSYSROOT__
+# define __XSYSROOT__ ""
+# endif
+	dirs[nd++] = __XSYSROOT__ "/usr/include";
+# else
 # if unix
 	dirs[nd++] = "/usr/include";
 # endif
@@ -1068,6 +1084,7 @@ main(argc,argv)
 	dirs[nd++] = "BTL$CLIB";
 # endif
 # endif
+# endif /* __MODERN__HOST__ */
 # ifdef gimpel
 	dirs[nd++] = intss() ?  "SYS3.C." : "" ;
 # endif

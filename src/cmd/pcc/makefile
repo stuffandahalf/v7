@@ -78,4 +78,4 @@ install:
 	cp macdefs mac2defs local.c code.c local2.c order.c table.c /usr/src/cmd/pcc
 
 clean:
-	rm *.o cgram.c ccom
+	rm -f *.o cgram.c ccom

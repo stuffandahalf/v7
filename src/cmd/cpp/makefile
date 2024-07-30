@@ -1,17 +1,24 @@
-CFLAGS=-O -n -s
+CFLAGS=-O -s $(XCFLAGS)
+LDFLAGS=-O -s $(XLDFLAGS)
 
 all:	cpp
 
 cp:	cpp
-	cp cpp /lib
-	rm *.o cpp
+	mkdir -p $(SYSROOT)/lib
+	cp cpp $(SYSROOT)/lib
+	$(MAKE) clean
 
 cmp:	cpp
 	cmp cpp /lib/cpp
-	rm *.o cpp
-
+	$(MAKE) clean
 cpp: cpp.o cpy.o
-	cc $(CFLAGS) cpp.o cpy.o -o cpp
+	$(CC) $(LDFLAGS) cpp.o cpy.o -o cpp
 cpp.o: cpp.c
-	cc $(CFLAGS) -c -Dunix=1 -Dpdp11=1 cpp.c
-cpy.o: cpy.y yylex.c
+	$(CC) $(CFLAGS) -c -Dunix=1 -Dpdp11=1 cpp.c
+cpy.c: cpy.y
+	YACC_PARSER=$(SYSROOT)/usr/lib/yaccpar $(YACC) cpy.y
+	mv y.tab.c cpy.c
+cpy.o: cpy.c yylex.c
+
+clean:
+	rm -f *.o cpy.c cpp

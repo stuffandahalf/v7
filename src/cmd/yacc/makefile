@@ -8,6 +8,8 @@ cmp: all
 	rm yacc *.o
 
 cp:	all
+	mkdir -p $(SYSROOT)/bin
+	mkdir -p $(SYSROOT)/usr/lib
 	cp yacc $(SYSROOT)/bin/yacc
 	cp yaccpar $(SYSROOT)/usr/lib/yaccpar
 	$(MAKE) clean

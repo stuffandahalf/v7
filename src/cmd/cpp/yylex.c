@@ -67,12 +67,12 @@ tobinary(st, b) char *st; {
 	s=st;
 	while (c = *s++) {
 	switch(c) {
-		case '0': case '1': case '2': case '3': case '4': 
-		case '5': case '6': case '7': case '8': case '9': 
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
 			t = c-'0'; break;
-		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': 
+		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
 			t = c-'a'; if (b>10) break;
-		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': 
+		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
 			t = c - 'A'; if (b>10) break;
 		default:
 			t = -1;
